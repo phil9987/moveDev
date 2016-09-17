@@ -1,8 +1,9 @@
+import random
+import string
+
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.shortcuts import render
 from django.http import HttpResponse
-import json
 from game.models import PlayBoard
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, transaction

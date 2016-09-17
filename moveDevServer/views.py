@@ -50,9 +50,8 @@ class Login(View):
         return super(Login, self).dispatch(request, *args, **kwargs)
 
     def post(self, request):
-        body = json.loads(request.body)
-        username = body['username']
-        password = body['password']
+        username = request.POST['username']
+        password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
