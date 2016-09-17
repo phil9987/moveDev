@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from moveDevServer.views import Home
+from moveDevServer.views import Home, StepsView
 
 urlpatterns = [
     url(r'^$', Home.as_view(), name='home-view'),
+    url(r'^steps$', StepsView.as_view(), name='steps-view'),
     url(r'^admin/', admin.site.urls),
     url(r'^fitbit/', include('fitapp.urls')),
 ]

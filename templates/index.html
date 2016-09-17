@@ -7,8 +7,8 @@ Hello
 {% if not request.user %}
 <form method="POST">
     {% csrf_token %}
-    <input name="username">
-    <input name="password">
+    <input name="username" placeholder="Username">
+    <input name="password" placeholder="Password">
 
     <button>submit</button>
 </form>
@@ -16,5 +16,9 @@ Hello
 <p>{{ request.user.username }}</p>
 <p>{{ request.user.userfitbit.fitbit_user }}</p>
 <p>{{ request.user.userfitbit.access_token }}</p>
+
+<form method="DELETE">
+    <button>Log Out</button>
+</form>
 {% endif %}
 {% endblock %}
