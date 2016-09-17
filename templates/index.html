@@ -3,8 +3,7 @@
 
 {% block content %}
 Hello
-
-{% if not request.user %}
+{% if not request.user.is_authenticated %}
 <form method="POST">
     {% csrf_token %}
     <input name="username" placeholder="Username">

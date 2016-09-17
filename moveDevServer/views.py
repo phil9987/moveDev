@@ -31,6 +31,23 @@ class Home(TemplateView):
         return self.render_to_response({})
 
 
+class Login(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(Login, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        body = json.loads(request.body)
+        username = body['username']
+        password = body['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponse(json.dumps({
+                'access_token': user.userfitbit.access_token
+            }), content_type="application/json")
+
+
 class StepsView(View):
     def get(self, request):
         try:
