@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+Hello
+
+{% if not request.user %}
+<form method="POST">
+    {% csrf_token %}
+    <input name="username">
+    <input name="password">
+
+    <button>submit</button>
+</form>
+{% else %}
+<p>{{ request.user.username }}</p>
+<p>{{ request.user.userfitbit.fitbit_user }}</p>
+<p>{{ request.user.userfitbit.access_token }}</p>
+{% endif %}
+{% endblock %}
