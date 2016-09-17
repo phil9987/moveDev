@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
@@ -12,27 +14,24 @@ import string
 @csrf_exempt
 @transaction.atomic
 def index(request):
+    if request.user.is_anonymous():
+        return HttpResponse(status=403)
     if request.method == 'GET':
-        p1_score = 79  # TODO: get real scores from backend
-        p2_score = -(56)  # TODO: get real scores from backend
-        p1_start = random.randint(0, 99)
-        p2_start = random.randint(0, 99)
-        random.seed(time.localtime()[5])
-        while p2_start == p1_start:
-            p2_start = random.randint(0, 100)
-        list = 100 * [0]
-        list[p1_start] = p1_score
-        list[p2_start] = p2_score
-        print list
-
-        board = PlayBoard.objects.create(player1_id=1, player2_id=2, game_id=0, currstate=list)
-        print board.currstate
-        res = []
-        for i in range(0, 10):
-            res.append(board.currstate[10 * i:10 * i + 10])
-        print len(PlayBoard.objects.all())
-        print str(board)
-        data = json.dumps(res)
+        board, created = PlayBoard.objects.get_or_create(
+            player1=request.user,
+            player2=User.objects.filter(~Q(id=request.user.id))[
+                random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)],
+            game_id=0,
+            finished_at=None
+        )
+        if created:
+            # randomizing players positions on new boards
+            board.currstate = [[0 for i in range(0, 10)] for i in range(0, 10)]  # blank matrix
+            row, col = random.randint(0, 9), random.randint(0, 9)
+            board.currstate[row][col] = board.player1.profile.credits
+            row, col = random.randint(0, 9), random.randint(0, 9)
+            board.currstate[row][col] = board.player2.profile.credits
+            board.save()
         return HttpResponse(str(board), content_type="application/json")
 
     elif request.method == 'POST':
@@ -45,7 +44,7 @@ def index(request):
         curr_state = board.currstate
         old_state = [int(x) for x in string.split(curr_state[1:-1], ',')]
         print old_state
-        sender_idx = sender_y*10 + sender_x
+        sender_idx = sender_y * 10 + sender_x
         print sender_idx
         print old_state[sender_idx]
         sender_score = int(old_state[sender_idx])
