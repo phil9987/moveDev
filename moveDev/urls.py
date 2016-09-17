@@ -15,13 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from moveDevServer.views import Home, StepsView, PointView, Login
+from moveDevServer.views import Home, StepsView, PointView, Login, subscriber
 
 urlpatterns = [
     url(r'^$', Home.as_view(), name='home-view'),
     url(r'^login$', Login.as_view(), name='login-view'),
     url(r'^steps$', StepsView.as_view(), name='steps-view'),
     url(r'^points$', PointView.as_view(), name='steps-view'),
+    url(r'^subscriber$', subscriber, name='steps-view'),
     url(r'^admin/', admin.site.urls),
     url(r'^fitbit/', include('fitapp.urls')),
     url(r'^game/', include('game.urls')),

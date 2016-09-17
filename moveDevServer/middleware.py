@@ -22,7 +22,6 @@ def authorization_middleware(get_response):
     def middleware(request):
         if request.META.get('HTTP_AUTHORIZATION', False):
             try:
-                print('wut wuth')
                 login(request, UserFitbit.objects.get(access_token=request.META['HTTP_AUTHORIZATION'].split(" ")[1]).user)
             except UserFitbit.DoesNotExist:
                 return HttpResponse(status=403)
