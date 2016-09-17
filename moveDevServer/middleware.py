@@ -12,7 +12,7 @@ def cors_middleware(get_response):
 
         response = get_response(request)
         response['Access-Control-Allow-Origin'] = "*"
-
+        response['Access-Control-Allow-Methods'] = 'POST,PUT,GET,DELETE,HEAD,OPTION'
         return response
 
     return middleware
