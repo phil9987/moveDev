@@ -7,36 +7,38 @@ from game.models import PlayBoard
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, transaction
 import random
-import time
 import string
 
 
 @csrf_exempt
 @transaction.atomic
 def index(request):
-    if request.user.is_anonymous():
-        return HttpResponse(status=403)
-    if request.method == 'GET':
-        board, created = PlayBoard.objects.get_or_create(
-            player1=request.user,
-            game_id=0,
-            finished_at=None
-        )
-        if created:
-            # randomizing players positions on new boards
-            board.currstate = [[0 for i in range(0, 10)] for i in range(0, 10)]  # blank matrix
-            row, col = random.randint(0, 9), random.randint(0, 9)
-            board.currstate[row][col] = board.player1.profile.credits
-            row, col = random.randint(0, 9), random.randint(0, 9)
-            board.currstate[row][col] = board.player2.profile.credits
+    #if request.method == 'GET':
+    #if request.user.is_anonymous():
+    #    return HttpResponse(status=403)
 
-            board.player2 = User.objects.filter(~Q(id=request.user.id))[
-                random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)]
+    board, created = PlayBoard.objects.get_or_create(
+        player1=request.user,
+        game_id=0,
+        finished_at=None
+    )
+    if created:
+        # randomizing players positions on new boards
+        board.currstate = [[0 for i in range(0, 10)] for i in range(0, 10)]  # blank matrix
+        row, col = random.randint(0, 9), random.randint(0, 9)
+        board.currstate[row][col] = board.player1.profile.credits
+        row, col = random.randint(0, 9), random.randint(0, 9)
+        board.player2 = User.objects.filter(~Q(id=request.user.id))[
+            random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)]
+        board.currstate[row][col] = board.player2.profile.credits
 
-            board.save()
-        return HttpResponse(str(board), content_type="application/json")
 
-    elif request.method == 'POST':
+        board.save()
+    return HttpResponse(str(board), content_type="application/json")
+
+
+def play(request):
+    if request.method == 'POST':
         data = request.POST
         sender_x = int(data['sender[x]'])
         sender_y = int(data['sender[y]'])
@@ -61,4 +63,4 @@ def index(request):
         board.currstate = old_state
         return HttpResponse(str(board), content_type="application/json")
     else:
-        return HttpResponse(status=200)
+        return HttpResponse(status=403)
