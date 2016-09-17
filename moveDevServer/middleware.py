@@ -13,6 +13,7 @@ def cors_middleware(get_response):
         response = get_response(request)
         response['Access-Control-Allow-Origin'] = "*"
         response['Access-Control-Allow-Methods'] = 'POST,PUT,GET,DELETE,HEAD,OPTION'
+        response['Access-Control-Allow-Headers'] = "Authorization"
         return response
 
     return middleware
@@ -20,6 +21,7 @@ def cors_middleware(get_response):
 
 def authorization_middleware(get_response):
     def middleware(request):
+        print(request.META.get('HTTP_AUTHORIZATION'))
         if request.META.get('HTTP_AUTHORIZATION', False):
             try:
                 login(request, UserFitbit.objects.get(access_token=request.META['HTTP_AUTHORIZATION'].split(" ")[1]).user)

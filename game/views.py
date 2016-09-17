@@ -14,28 +14,26 @@ import string
 @csrf_exempt
 @transaction.atomic
 def index(request):
-    #if request.method == 'GET':
-    #if request.user.is_anonymous():
-    #    return HttpResponse(status=403)
+    if request.method == 'GET':
+        board, created = PlayBoard.objects.get_or_create(
+            player1=request.user,
+            game_id=0,
+            finished_at=None
+        )
+        if created:
+            # randomizing players positions on new boards
+            board.currstate = [[0 for i in range(0, 10)] for i in range(0, 10)]  # blank matrix
+            row, col = random.randint(0, 9), random.randint(0, 9)
+            board.currstate[row][col] = board.player1.profile.credits
+            row, col = random.randint(0, 9), random.randint(0, 9)
+            board.player2 = User.objects.filter(~Q(id=request.user.id))[
+                random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)]
+            board.currstate[row][col] = board.player2.profile.credits
 
-    board, created = PlayBoard.objects.get_or_create(
-        player1=request.user,
-        game_id=0,
-        finished_at=None
-    )
-    if created:
-        # randomizing players positions on new boards
-        board.currstate = [[0 for i in range(0, 10)] for i in range(0, 10)]  # blank matrix
-        row, col = random.randint(0, 9), random.randint(0, 9)
-        board.currstate[row][col] = board.player1.profile.credits
-        row, col = random.randint(0, 9), random.randint(0, 9)
-        board.player2 = User.objects.filter(~Q(id=request.user.id))[
-            random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)]
-        board.currstate[row][col] = board.player2.profile.credits
-
-
-        board.save()
-    return HttpResponse(str(board), content_type="application/json")
+            board.save()
+        return HttpResponse(str(board), content_type="application/json")
+    else:
+        return HttpResponse({})
 
 
 def play(request):
