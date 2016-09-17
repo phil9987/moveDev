@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^points$', PointView.as_view(), name='steps-view'),
     url(r'^admin/', admin.site.urls),
     url(r'^fitbit/', include('fitapp.urls')),
+    url(r'^game/', include('game.urls')),
 ]
