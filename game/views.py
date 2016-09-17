@@ -1,14 +1,18 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
+from game.models import PlayBoard
 
 
 def index(request):
-    init_arr = []
-    for i in range(0,10):
-        init_arr.append([0]*10)
-    print init_arr
-    init_arr[0][3] = 77
-    init_arr[8][8] = -68
-    data = json.dumps(init_arr)
-    return HttpResponse(data, content_type='application/json')
+    if request.method == 'GET':
+        board = PlayBoard(player1=1, player2=2)
+        #init_arr = board.state
+        res = []
+        for i in range(0, 10):
+            res.append(board.state[10 * i:10 * i + 10])
+        data =  json.dumps(res)
+        return HttpResponse(data, content_type='application/json')
+
+    elif request.method == 'PUT':
+        return HttpResponse({'data': 'None'}, content_type='application/json')
