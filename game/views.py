@@ -19,8 +19,6 @@ def index(request):
     if request.method == 'GET':
         board, created = PlayBoard.objects.get_or_create(
             player1=request.user,
-            player2=User.objects.filter(~Q(id=request.user.id))[
-                random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)],
             game_id=0,
             finished_at=None
         )
@@ -31,6 +29,10 @@ def index(request):
             board.currstate[row][col] = board.player1.profile.credits
             row, col = random.randint(0, 9), random.randint(0, 9)
             board.currstate[row][col] = board.player2.profile.credits
+
+            board.player2 = User.objects.filter(~Q(id=request.user.id))[
+                random.randint(0, User.objects.filter(~Q(id=request.user.id)).count() - 1)]
+
             board.save()
         return HttpResponse(str(board), content_type="application/json")
 
