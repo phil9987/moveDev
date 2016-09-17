@@ -1,3 +1,4 @@
+import json
 import random
 import string
 
@@ -31,35 +32,30 @@ def index(request):
             board.currstate[row][col] = board.player2.profile.credits
 
             board.save()
-        return HttpResponse(str(board), content_type="application/json")
+        return HttpResponse(json.dumps({"gameState": board.currstate, "gameId": board.id}), content_type="application/json")
     else:
         return HttpResponse({})
 
 
+@csrf_exempt
 def play(request):
     if request.method == 'POST':
         data = request.POST
         sender_x = int(data['sender[x]'])
         sender_y = int(data['sender[y]'])
         rcvr_x = int(data['reciever[x]'])
-        rcvr_y = int(data['reciever[x]'])
-        board = PlayBoard.objects.filter(game_id=0)[0]
-        curr_state = board.currstate
-        old_state = [int(x) for x in string.split(curr_state[1:-1], ',')]
-        print old_state
-        sender_idx = sender_y * 10 + sender_x
-        print sender_idx
-        print old_state[sender_idx]
-        sender_score = int(old_state[sender_idx])
-        print sender_score
-        rcvr_idx = rcvr_y * 10 + rcvr_x
-        receiver_score = int(old_state[rcvr_idx])
-        print receiver_score
-        sender_score = sender_score / 2
-        receiver_score += sender_score
-        old_state[sender_idx] = sender_score
-        old_state[rcvr_idx] = receiver_score
-        board.currstate = old_state
-        return HttpResponse(str(board), content_type="application/json")
+        rcvr_y = int(data['reciever[y]'])
+
+        board = PlayBoard.objects.get(id=request.GET['id'])
+        currstate = json.loads(board.currstate)
+        sender_value = currstate[sender_x][sender_y]
+        currstate[rcvr_x][rcvr_y] = sender_value / 2
+        currstate[sender_x][sender_y] = sender_value / 2
+        board.currstate = json.dumps(currstate)
+        print(currstate)
+        print(rcvr_x, rcvr_y)
+        print(sender_x, sender_y)
+        board.save()
+        return HttpResponse(json.dumps({"gameState": board.currstate, "gameId": board.id}), content_type="application/json")
     else:
-        return HttpResponse(status=403)
+        return HttpResponse(status=200)
