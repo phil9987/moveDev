@@ -9,6 +9,9 @@ python, django
 
 ## Usage
 To start the backend, basically the following steps are necessary:
+
 1) get UI running: https://github.com/HackZurich2016/moveDev.ui
+
 2) python manage.py migrate --creates databases
+
 3) python manage.py runserver --runs server on localhost
